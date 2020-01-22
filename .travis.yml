@@ -109,4 +109,8 @@ script:
     -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
     -G "${CMAKE_GENERATOR}" ../
   - cmake --build .
+  - cd ../project
+  - mkdir -p build && pushd build
+  - cmake ..
+  - cmake --build .
 
