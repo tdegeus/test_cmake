@@ -61,7 +61,7 @@ before_script:
   - cmake --version
 
 script:
-  - cmake ..
+  - cmake .
   - sudo make install
   - cd project
   - cmake .
