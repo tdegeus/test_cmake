@@ -108,7 +108,7 @@ script:
     cmake --warn-uninitialized --debug-output
     -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
     -G "${CMAKE_GENERATOR}" ../
-  - cmake --build . --target install
+  - sudo cmake --build . --target install
   - cd ../project
   - mkdir -p build && pushd build
   - cmake ..
