@@ -1,96 +1,62 @@
-sudo: required
 language: cpp
-
-addons: &gcc7
-  apt:
-    packages:
-      - g++-7
-      - ninja-build
-    sources:
-      - ubuntu-toolchain-r-test
-
-addons: &clang6
-  apt:
-    packages:
-      - clang-6.0
-      - ninja-build
-    sources:
-      - ubuntu-toolchain-r-test
-      - llvm-toolchain-xenial-6.0
-
-addons: &clang7
-  apt:
-    packages:
-      - clang-7
-      - ninja-build
-    sources:
-      - ubuntu-toolchain-r-test
-      - llvm-toolchain-xenial-7
+sudo: require
 
 matrix:
+
   include:
     - os: linux
       dist: trusty
+      env:
+        - GCC_VERSION=4.9
       addons:
         apt:
           packages:
-            - ninja-build
+            - g++-4.9
+            - cmake
+          sources:
+            - ubuntu-toolchain-r-test
 
     - os: linux
       dist: xenial
       env:
         - GCC_VERSION=7
-      addons: *gcc7
+      addons:
+        apt:
+          packages:
+            - g++-7
+            - cmake
+          sources:
+            - ubuntu-toolchain-r-test
 
     - os: linux
       dist: xenial
       env:
         - CLANG_VERSION=6.0
-      addons: *clang6
+      addons:
+        apt:
+          packages:
+            - clang-6.0
+            - cmake
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-6.0
 
     - os: linux
       dist: xenial
       env:
         - CLANG_VERSION=7
-      addons: *clang7
+      addons:
+        apt:
+          packages:
+            - clang-7
+            - cmake
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-7
 
     - os: osx
       osx_image: xcode10.3
       env:
-
-    - os: windows
-      env:
-
-env:
-  global:
-    - MINCONDA_VERSION="latest"
-    - MINCONDA_LINUX="Linux-x86_64"
-    - MINCONDA_OSX="MacOSX-x86_64"
-
-install:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      MINCONDA_OS=$MINCONDA_LINUX;
-    elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-      HOMEBREW_NO_AUTO_UPDATE=1 brew install boost hdf5 eigen ninja;
-      MINCONDA_OS=$MINCONDA_OSX;
-    fi
-
-  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
-      export CMAKE_GENERATOR="Visual Studio 15 2017 Win64" ;
-      export TESTS_TARGET="RUN_TESTS";
-      choco install --yes miniconda3 ;
-      source C:/Tools/miniconda3/Scripts/activate ;
-    else
-      export CMAKE_GENERATOR="Ninja" ;
-      export TESTS_TARGET="test";
-      wget "http://repo.continuum.io/miniconda/Miniconda3-$MINCONDA_VERSION-$MINCONDA_OS.sh" -O miniconda.sh;
-      bash miniconda.sh -b -p $HOME/miniconda ;
-      source $HOME/miniconda/bin/activate;
-      hash -r ;
-    fi
-  - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
-  - conda install -c conda-forge cmake make
 
 before_script:
   - if [ -n "$GCC_VERSION" ]; then export CXX="g++-${GCC_VERSION}" CC="gcc-${GCC_VERSION}"; fi
@@ -102,11 +68,10 @@ before_script:
   - cmake --version
 
 script:
-  - cd ${TRAVIS_BUILD_DIR}
-  - mkdir -p build && pushd build
-  - >
-    cmake --warn-uninitialized --debug-output
-    -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
-    -G "${CMAKE_GENERATOR}" ../
-  - cmake --build .
+  - cmake .
+  - sudo make install
+  - cd project
+  - cmake .
+  - make
+  - ./myexec
 
