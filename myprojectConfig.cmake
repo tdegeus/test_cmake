@@ -6,6 +6,7 @@ if(NOT TARGET myproject)
 endif()
 
 if(NOT TARGET myproject::extra)
+    add_library(myproject::extra INTERFACE IMPORTED)
     if(MSVC)
         set_property(TARGET myproject::extra PROPERTY INTERFACE_COMPILE_OPTIONS /W4)
     else()
